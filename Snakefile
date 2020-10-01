@@ -1,19 +1,6 @@
 import os
 import glob
 
-#def get_filtered():
-#        filenames = [os.path.basename(f) for f in glob.glob('Kraken_filtered*.tabular')]
-#        return sorted(filenames)
-#
-#def get_translated():
-#        filenames = [os.path.basename(f) for f in glob.glob('Kraken_translated*.tabular')]
-#        return sorted(filenames)
-
-#def output_samples():
-#        filenames = [os.path.splitext(f)[0] for f in glob.glob('Kraken_translated*.tabular')]
-#        samples = ['RF_'+f.split('_')[3] for f in filenames]
-#        return sorted(samples)
-
 SAMPLE = [os.path.basename(f).split('_')[3].split('.')[0] for f in glob.glob('Kraken_translate*.tabular')]
 
 rule all:
