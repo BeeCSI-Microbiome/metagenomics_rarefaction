@@ -1,0 +1,17 @@
+configfile: "config.yaml"
+
+rule filter_apis:
+	input:
+		expand("{sample}.txt", sample=config["samples"])
+	output:
+		expand("filtered/{sample}_filtered.txt", sample=config["samples"])
+	shell:
+		"cat {input} | grep -v \"Apis mellifera\" > {output}"
+
+rule translate:
+	input:
+		expand("filtered/{sample}_filtered.txt", sample=config["samples"])
+	output:
+		expand("translated/{sample}.labels", sample=config["samples"])
+	shell:
+		"kraken-translate --db beerolama_v1 {input} > {output}"
