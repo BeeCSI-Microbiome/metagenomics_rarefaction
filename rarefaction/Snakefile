@@ -1,4 +1,5 @@
 configfile: "config.yaml"
+SAMPLES=config["samples"]
 
 rule filter_apis:
 	input:
@@ -15,3 +16,12 @@ rule translate:
 		expand("translated/{sample}.labels", sample=config["samples"])
 	shell:
 		"kraken-translate --db beerolama_v1 {input} > {output}"
+
+rule krakefaction:
+	input:
+		trans=expand("translated/{sample}.labels", sample=config["samples"])
+		untrans=expand("{sample}.txt", sample=config["samples"])
+	output:
+		expand("rarefied/{sample}.csv", sample=SAMPLES)
+	shell:
+		krakefaction -u {input.untrans} -t {input.trans} -o {output}
