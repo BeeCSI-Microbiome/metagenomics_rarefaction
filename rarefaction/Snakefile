@@ -1,27 +1,33 @@
 configfile: "config.yaml"
 SAMPLES=config["samples"]
 
+rule all:
+	input:
+		expand("rarefied/{sample}.csv", sample=SAMPLES)
+
+
 rule filter_apis:
 	input:
-		expand("{sample}.txt", sample=config["samples"])
+		"{sample}.txt"
 	output:
-		expand("filtered/{sample}_filtered.txt", sample=config["samples"])
+		"filtered/{sample}_filtered.txt"
 	shell:
 		"cat {input} | grep -v \"Apis mellifera\" > {output}"
 
 rule translate:
 	input:
-		expand("filtered/{sample}_filtered.txt", sample=config["samples"])
+		database = "beerolama_v1",
+		readfile = "filtered/{sample}_filtered.txt"
 	output:
-		expand("translated/{sample}.labels", sample=config["samples"])
+		"translated/{sample}.labels"
 	shell:
-		"kraken-translate --db beerolama_v1 {input} > {output}"
+		"kraken-translate --db {input.database} {input.readfile} > {output}"
 
 rule krakefaction:
 	input:
-		trans=expand("translated/{sample}.labels", sample=config["samples"])
-		untrans=expand("{sample}.txt", sample=config["samples"])
+		trans="translated/{sample}.labels",
+		untrans="{sample}.txt"
 	output:
-		expand("rarefied/{sample}.csv", sample=SAMPLES)
+		"rarefied/{sample}.csv"
 	shell:
-		krakefaction -u {input.untrans} -t {input.trans} -o {output}
+		"krakefaction -u {input.untrans} -t {input.trans} -o {output}"
