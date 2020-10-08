@@ -29,8 +29,7 @@ def main():
     """Verify inputs, then run script"""
     # get inspection filename and filtered kraken output file paths from snakemake
     db_inspection, infile_paths = get_inputs()
-
-    taxon_tree = get_taxon_tree(db_inspection)
+    run(db_inspection, infile_paths)
     
 """
 # =============================================================================
@@ -73,7 +72,12 @@ def check_file_existence(db_ins, in_paths):
     return
         
 
+def run(db_inspection, infile_paths):
+    """Main logical control of the script occurs within"""
+    taxon_tree = get_taxon_tree(db_inspection)
+
 def get_taxon_tree(db_ins):
+    """Produce a taxonomy tree for retrieving lineages of reads"""
     return ''
 
 
