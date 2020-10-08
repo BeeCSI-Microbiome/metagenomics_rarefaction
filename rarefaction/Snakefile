@@ -30,7 +30,7 @@ rule translate:
 		readfiles = expand("filtered/{sample}_filtered.txt", sample=SAMPLES)
 	output:
 		expand("translated/{sample}.txt", sample=SAMPLES)
-	shell:
+	script:
 		"scripts/kraken2-translate.py"
 
 rule krakefaction:
