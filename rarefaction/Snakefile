@@ -1,12 +1,13 @@
 configfile: "config.yaml"
 SAMPLES=config["samples"]
+DB=config["database"]
 
 rule all:
 	input:
 		expand("rarefied/{sample}.csv", sample=SAMPLES)
 
-
-rule filter_apis:
+# filter out reads that are host (A. mellifera), or unclassified
+rule filter:
 	input:
 		"{sample}.txt"
 	output:
@@ -14,18 +15,27 @@ rule filter_apis:
 	shell:
 		"cat {input} | grep -v \"Apis mellifera\|unclassified\" > {output}"
 
+rule get_db_inspection:
+    input:
+        DB
+    output:
+        "db_inspection.txt"
+    shell:
+        "kraken2-inspect --db {input} > db_inspection.txt"
+
+# TODO: translation must be done with custom script
 rule translate:
 	input:
-		database = "beerolama_v1",
-		readfile = "filtered/{sample}_filtered.txt"
+		db_inspection = "db_inspection.txt"
+		readfiles = expand("filtered/{sample}_filtered.txt", sample=config["samples"])
 	output:
-		"translated/{sample}.labels"
+		"translated/{sample}.txt"
 	shell:
-		"kraken-translate --db {input.database} {input.readfile} > {output}"
+		"scripts/kraken2-translate.py"
 
 rule krakefaction:
 	input:
-		trans="translated/{sample}.labels",
+		trans="translated/{sample}.txt",
 		untrans="{sample}.txt"
 	output:
 		"rarefied/{sample}.csv"
