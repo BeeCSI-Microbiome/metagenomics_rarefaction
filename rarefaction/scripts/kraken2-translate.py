@@ -50,7 +50,7 @@ class TaxonNode:
         return self.clade_count == sum([subtaxon.clade_count for subtaxon in self.subtaxa])
 
     def __str__(self):
-        s = 'Taxon name: {} rank {}\n'.format(self.name, self.rank)
+        s = 'Taxon name: {} - Rank {}\n'.format(self.name, self.rank)
         s += '\tTaxa ID: {}\n'.format(self.taxid)
         s += '\tClade count: {}\n'.format(self.clade_count)
         s += '\tTaxa count: {}\n'.format(self.taxa_count)
@@ -85,7 +85,7 @@ def get_inputs():
        Database inspection file, and paths to filtered kraken output files"""
     # retrieve the name of the inspection file from snakemake
     db_inspection = snakemake.input[0]
-    l.debug(db_inspection)
+    l.debug('Name of database inspection file: {}'.format(db_inspection))
 
     # retrieve the paths of filtered files from snakemake
     infile_paths = snakemake.input[1:]
@@ -126,12 +126,12 @@ def get_taxon_tree(db_ins):
     # get database inspection file as list of lines
     with open(db_ins, 'r') as f:
         inspection_lines = f.readlines()
-    l.debug('Head of inspection file ' + inspection_lines[:5])
+    l.debug('Head of inspection file {}'.format(inspection_lines[:5]))
 
     
     # create root node
     root_line = inspection_lines[0].split('\t')
-    root_node = TaxonNode(**root_line[1:])
+    root_node = TaxonNode(*root_line[1:])
     l.debug(root_node)
     
 
