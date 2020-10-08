@@ -26,7 +26,7 @@ rule get_db_inspection:
 # TODO: translation must be done with custom script
 rule translate:
 	input:
-		db_inspection = "db_inspection.txt"
+		db_inspection = "db_inspection.txt",
 		readfiles = expand("filtered/{sample}_filtered.txt", sample=config["samples"])
 	output:
 		"translated/{sample}.txt"
