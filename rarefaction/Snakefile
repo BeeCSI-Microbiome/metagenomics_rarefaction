@@ -27,9 +27,9 @@ rule get_db_inspection:
 rule translate:
 	input:
 		db_inspection = "db_inspection.txt",
-		readfiles = expand("filtered/{sample}_filtered.txt", sample=config["samples"])
+		readfiles = expand("filtered/{sample}_filtered.txt", sample=SAMPLES)
 	output:
-		"translated/{sample}.txt"
+		expand("translated/{sample}.txt", sample=SAMPLES)
 	shell:
 		"scripts/kraken2-translate.py"
 
