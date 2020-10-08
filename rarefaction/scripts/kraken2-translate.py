@@ -19,8 +19,10 @@ def main():
     print(pID, len(infile_paths))
 
     # check file existence
-    print(pID, 'current directory:', os.getcwd)
+    print(pID, 'current directory:', os.getcwd())
     print(pID, 'does {} exist'.format(db_inspection), os.path.isfile(db_inspection))
+
+    taxon_tree = get_taxon_tree(db_inspection)
     
 
 
@@ -28,6 +30,9 @@ def main():
 # =============================================================================
 # =============================================================================
 """
+
+def get_taxon_tree(db_ins):
+    return
 
 
 if __name__ == '__main__':
