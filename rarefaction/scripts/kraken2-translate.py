@@ -24,6 +24,47 @@ l.propagate = False
 """
 
 """
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Class - TaxonNode
+------
+PURPOSE
+-------
+This class represents a node of a taxonomic level, with links to subtaxa and 
+supertaxon.
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"""
+class TaxonNode:
+
+    def __init__(self, clade_count, taxa_count, rank, taxid, name, supertaxon=None):
+        self.clade_count = int(clade_count) # num of db entries of this + subtaxa
+        self.taxa_count = int(taxa_count)   # num of db entries of this exact taxa
+        self.rank = rank
+        self.taxid = taxid
+        self.name = name.strip()
+        self.supertaxon = supertaxon        # link to supertaxon node
+        self.subtaxa = []                   # list of links to subtaxa nodes
+
+    def check_clade_sum(self):
+        """Returns boolean on whether the sum of subtaxa clade_counts equals
+           this node's clade_count"""
+        return self.clade_count == sum([subtaxon.clade_count for subtaxon in self.subtaxa])
+
+    def __str__(self):
+        s = 'Taxon name: {} rank {}\n'.format(self.name, self.rank)
+        s += '\tTaxa ID: {}\n'.format(self.taxid)
+        s += '\tClade count: {}\n'.format(self.clade_count)
+        s += '\tTaxa count: {}\n'.format(self.taxa_count)
+        s += '\tSupertaxa: {}\n'.format(self.supertaxon)
+        s += '\tSubtaxa: {}\n'.format(' '.join([subtaxon.name for subtaxon in self.subtaxa]))
+        return s
+
+"""
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"""
+
+
+"""
 # =============================================================================
 MAIN
 # =============================================================================
@@ -78,14 +119,26 @@ def check_file_existence(db_ins, in_paths):
 def run(db_inspection, infile_paths):
     """Main logical control of the script occurs within"""
     taxon_tree = get_taxon_tree(db_inspection)
+    
 
 def get_taxon_tree(db_ins):
     """Produce a taxonomy tree for retrieving lineages of reads"""
-
+    # get database inspection file as list of lines
     with open(db_ins, 'r') as f:
         inspection_lines = f.readlines()
+    l.debug('Head of inspection file ' + inspection_lines[:5])
+
     
-    l.debug(inspection_lines[:5])
+    # create root node
+    root_line = inspection_lines[0].split('\t')
+    root_node = TaxonNode(**root_line[1:])
+    l.debug(root_node)
+    
+
+    for taxon in [line.split('\t') for line in inspection_lines[1:]]:
+        pass
+        
+
     return ''
 
 
