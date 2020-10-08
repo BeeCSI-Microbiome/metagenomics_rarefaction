@@ -8,13 +8,16 @@ import os
 import logging
 
 # initialize logging
-l = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+l = logging.getLogger('Log')
 c_handler = logging.StreamHandler()
 # Change DEBUG to WARNING when testing is finished
 c_handler.setLevel(logging.DEBUG)
+c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+c_handler.setFormatter(c_format)
 l.addHandler(c_handler)
+l.propagate = False
 
-pID = 'TRANSLATION STEP:'
 """
 # =============================================================================
 # =============================================================================
