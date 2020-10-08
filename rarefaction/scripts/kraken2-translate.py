@@ -41,11 +41,11 @@ def get_inputs():
        Database inspection file, and paths to filtered kraken output files"""
     # retrieve the name of the inspection file from snakemake
     db_inspection = snakemake.input[0]
-    l.debug(pID, db_inspection)
+    l.debug(db_inspection)
 
     # retrieve the paths of filtered files from snakemake
     infile_paths = snakemake.input[1:]
-    l.debug(pID, len(infile_paths))
+    l.debug('{} input files were received from snakemake'.format(len(infile_paths)))
 
     # verifiy files
     check_file_existence(db_inspection, infile_paths)
