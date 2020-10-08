@@ -81,6 +81,11 @@ def run(db_inspection, infile_paths):
 
 def get_taxon_tree(db_ins):
     """Produce a taxonomy tree for retrieving lineages of reads"""
+
+    with open(db_ins, 'r') as f:
+        inspection_lines = f.readlines()
+    
+    l.debug(inspection_lines[:5])
     return ''
 
 
