@@ -1,3 +1,4 @@
+database: "beerolama_v1"
 samples: 
  - shallow/shallow_AG-Ab-10_classification
  - shallow/shallow_AG-Ab-11_classification
@@ -70,5 +71,3 @@ samples:
  - deep/deep_AG-Hind-2_classification
  - deep/deep_AG-Hind-3_classification
  - deep/deep_AG-Hind-7_classification
-
- database: "beerolama_v1"
