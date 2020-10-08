@@ -12,7 +12,7 @@ rule filter_apis:
 	output:
 		"filtered/{sample}_filtered.txt"
 	shell:
-		"cat {input} | grep -v \"Apis mellifera\" > {output}"
+		"cat {input} | grep -v \"Apis mellifera\|unclassified\" > {output}"
 
 rule translate:
 	input:
