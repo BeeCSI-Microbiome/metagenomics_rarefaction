@@ -251,7 +251,7 @@ def build_taxa_dict(t_dict, node):
     if node.lineage:
         t_dict[node.taxid] = node.lineage
     for sub in node.subtaxa:
-        build(t_dict, sub)
+        build_taxa_dict(t_dict, sub)
 
 def print_tree(root):
     """Prints out tree top down"""
