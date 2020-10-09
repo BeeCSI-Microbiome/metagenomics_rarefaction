@@ -51,25 +51,23 @@ class TaxonNode:
            this node's clade_count"""
         return self.clade_count == sum([subtaxon.clade_count for subtaxon in self.subtaxa])
 
-    def add_child(self, subtaxon):
+    def add_child(self, child):
         """Add a subtaxon child node to this node
            Add the new node's taxa_count to the subtaxa_sum of all supertaxa"""
         # add to parent's subtaxa list
-        self.subtaxa.append(subtaxon)
+        self.subtaxa.append(child)
         # add parent as child's supertaxa
-        subtaxon.supertaxon = self
+        child.supertaxon = self
 
-        if subtaxon.taxa_count != 0:
+        if child.taxa_count != 0:
             # add tax_count to parent's sum
-            self.subtaxa_sum += subtaxon.taxa_count
+            self.subtaxa_sum += child.taxa_count
 
             curr_parent = self
             # add to any further ancestor's sums
             while curr_parent.supertaxon is not None:
                 curr_parent = curr_parent.supertaxon
-                curr_parent.subtaxa_sum += subtaxon.taxa_count
-        
-        l.debug('Made following node child of next node:\n{}\n{}'.format(subtaxon, self))
+                curr_parent.subtaxa_sum += child.taxa_count
 
         return
 
@@ -196,6 +194,8 @@ def create_tree(inspection_lines):
         if not new_node.has_full_subtaxa:
             stack.append(new_node)
             l.debug('Putting {} on top of stack'.format(new_node.name))
+        
+        l.debug('New node after adding to tree:\n{}'.format(new_node))
     
     return root_node
     
