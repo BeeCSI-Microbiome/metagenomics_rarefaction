@@ -157,6 +157,7 @@ def create_taxon_dict(db_ins):
     l.debug('Head of inspection file {}'.format(inspection_lines[:5]))
 
     root = create_tree(inspection_lines)    
+    print_tree(root)
 
     return ''
 
@@ -169,7 +170,7 @@ def create_tree(inspection_lines):
     # create root node
     root_line = inspection_lines.popleft().split('\t')
     root_node = TaxonNode(*root_line[1:])
-    l.debug('Create root node:\n{}'.format(root_node))
+    #l.debug('Create root node:\n{}'.format(root_node))
 
     # stack for tracking nodes with more subtaxa to add
     stack = []
@@ -181,7 +182,7 @@ def create_tree(inspection_lines):
         curr_node = stack[-1]
         # create new taxon node
         new_node = TaxonNode(*inspection_lines.popleft().split('\t')[1:])
-        l.debug('Creating node for {}'.format(new_node.name))
+        #l.debug('Creating node for {}'.format(new_node.name))
         
         # if current node has full subtaxa list, pop stack until otherwise
         if curr_node.has_full_subtaxa():
@@ -189,11 +190,11 @@ def create_tree(inspection_lines):
 
         # add the new node to the parent node
         curr_node.add_child(new_node)
-        l.debug('Adding {} as direct subtaxa of {}'.format(new_node.name, curr_node.name))
+        #l.debug('Adding {} as direct subtaxa of {}'.format(new_node.name, curr_node.name))
         # put new node on top of stack if it still needs subtaxa
         if not new_node.has_full_subtaxa():
             stack.append(new_node)
-            l.debug('Putting {} on top of stack'.format(new_node.name))
+            #l.debug('Putting {} on top of stack'.format(new_node.name))
         
         #l.debug('New node after adding to tree:\n{}'.format(new_node))
     
@@ -207,10 +208,16 @@ def find_next_parent(stack):
         return stack[-1]
     else:
         stack.pop()
-        l.debug('Popping node:\n{}'.format(node))
+        #l.debug('Popping node:\n{}'.format(node))
         return find_next_parent(stack)
 
-
+def print_tree(root):
+    """Prints out tree top down"""
+    print(root)
+    for sub in root.subtaxa:
+        print_tree(sub)
+        
+    return
 
 if __name__ == '__main__':
     main()
