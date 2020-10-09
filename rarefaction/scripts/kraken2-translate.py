@@ -6,6 +6,7 @@ GLOBALS & IMPORTS
 """
 import os
 import logging
+from collections import deque
 
 # initialize logging
 logging.basicConfig(level=logging.DEBUG)
@@ -38,16 +39,42 @@ class TaxonNode:
     def __init__(self, clade_count, taxa_count, rank, taxid, name, supertaxon=None):
         self.clade_count = int(clade_count) # num of db entries of this + subtaxa
         self.taxa_count = int(taxa_count)   # num of db entries of this exact taxa
-        self.rank = rank
+        self.rank = rank.lower()
         self.taxid = taxid
         self.name = name.strip()
         self.supertaxon = supertaxon        # link to supertaxon node
         self.subtaxa = []                   # list of links to subtaxa nodes
+        self.subtaxa_sum = taxa_count
 
     def check_clade_sum(self):
         """Returns boolean on whether the sum of subtaxa clade_counts equals
            this node's clade_count"""
         return self.clade_count == sum([subtaxon.clade_count for subtaxon in self.subtaxa])
+
+    def add_child(self, subtaxon):
+        """Add a subtaxon child node to this node
+           Add the new node's taxa_count to the subtaxa_sum of all supertaxa"""
+        # add to parent's subtaxa list
+        self.subtaxa.append(subtaxon)
+        # add parent as child's supertaxa
+        subtaxon.supertaxon = self
+
+        if subtaxon.taxa_count != 0:
+            # add tax_count to parent's sum
+            self.subtaxa_sum += subtaxon.taxa_count
+
+            curr_parent = self
+            # add to any further ancestor's sums
+            while curr_parent.supertaxon is not None:
+                curr_parent = curr_parent.supertaxon
+                curr_parent.subtaxa_sum += subtaxon.taxa_count
+
+        return
+
+
+    def has_full_subtaxa(self):
+        """Return boolean whether all subtaxa have been added to this node"""
+        return self.subtaxa_sum == self.clade_count
 
     def __str__(self):
         s = 'Taxon name: {} - Rank {}\n'.format(self.name, self.rank)
@@ -62,7 +89,6 @@ class TaxonNode:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 """
-
 
 """
 # =============================================================================
@@ -118,28 +144,65 @@ def check_file_existence(db_ins, in_paths):
 
 def run(db_inspection, infile_paths):
     """Main logical control of the script occurs within"""
-    taxon_tree = get_taxon_tree(db_inspection)
+    taxon_dict = create_taxon_dict(db_inspection)
     
 
-def get_taxon_tree(db_ins):
-    """Produce a taxonomy tree for retrieving lineages of reads"""
+def create_taxon_dict(db_ins):
+    """Produce a taxonomy dictionary with taxids as keys and lineage strings as values"""
     # get database inspection file as list of lines
     with open(db_ins, 'r') as f:
         inspection_lines = f.readlines()
     l.debug('Head of inspection file {}'.format(inspection_lines[:5]))
 
-    
-    # create root node
-    root_line = inspection_lines[0].split('\t')
-    root_node = TaxonNode(*root_line[1:])
-    l.debug(root_node)
-    
-
-    for taxon in [line.split('\t') for line in inspection_lines[1:]]:
-        pass
-        
+    root = create_tree(inspection_lines)    
 
     return ''
+
+
+def create_tree(inspection_lines):
+    """Create the taxonomy tree and return the root node"""
+    # make deque for leftpopping of inspection lines
+    inspection_lines = deque(inspection_lines)
+    
+    # create root node
+    root_line = inspection_lines.popleft().split('\t')
+    root_node = TaxonNode(*root_line[1:])
+    l.debug('Create root node:\n{}'.format(root_node))
+
+    # stack for tracking nodes with more subtaxa to add
+    stack = []
+    stack.append(root_node)
+
+    # while there are still lines to make nodes from
+    while not inspection_lines:
+        # get the node at the top of the stack
+        curr_node = stack[-1]
+        # create new taxon node
+        new_node = TaxonNode(*inspection_lines.popleft().split('\t')[1:])
+        
+        # if current node has full subtaxa list, pop stack until otherwise
+        if curr_node.has_full_subtaxa():
+            curr_node = find_next_parent(stack)
+
+        # add the new node to the parent node
+        curr_node.add_child(new_node)
+
+        # put new node on top of stack if it still needs subtaxa
+        if not new_node.has_full_subtaxa:
+            stack.append(new_node)
+    
+    return root_node
+    
+
+def find_next_parent(stack):
+    """Pops stack until a node that still needs children is found"""
+    node = stack.pop()
+    l.debug('Popping node:\n{}'.format(node))
+    if not node.has_full_subtaxa():
+        return node
+    else:
+        return find_next_parent(stack)
+
 
 
 if __name__ == '__main__':
