@@ -48,7 +48,7 @@ class TaxonNode:
         self.supertaxon = supertaxon        # link to supertaxon node
         self.subtaxa = []                   # list of links to subtaxa nodes
         self.subtaxa_sum = int(taxa_count)
-        self.lineage = self.create_lineage()
+        self.lineage = ''
 
     def create_lineage(self):
         """Returns appropriate lineage string, based on ancestors"""
@@ -78,6 +78,9 @@ class TaxonNode:
                 curr_parent = curr_parent.supertaxon
                 curr_parent.subtaxa_sum += child.taxa_count
 
+        # now that child has parent, create lineage
+        child.lineage = child.create_lineage()
+
         return
 
     def has_full_subtaxa(self):
@@ -100,11 +103,8 @@ class TaxonNode:
 
 def get_superlineage(node):
     """Recursively finds the most recent lineage string from ancestors"""
-    # base case, reached root
-    if not node.supertaxon:
-        return ""
     # if supertaxon's lineage is not an empty string, return it
-    if node.supertaxon:
+    if node.supertaxon.lineage:
         return node.supertaxon.lineage
     # Else, recurse
     else:
