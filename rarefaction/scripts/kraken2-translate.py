@@ -19,6 +19,9 @@ c_handler.setFormatter(c_format)
 l.addHandler(c_handler)
 l.propagate = False
 
+# ranks that krakefaction needs for lineage
+TAXA_RANKS = ['d','p','c','o','f','g','s']
+
 """
 # =============================================================================
 # =============================================================================
@@ -41,15 +44,21 @@ class TaxonNode:
         self.taxa_count = int(taxa_count)   # num of db entries of this exact taxa
         self.rank = rank.lower()
         self.taxid = taxid
-        self.name = name.strip()
+        self.name = name.strip().replace(' ', '_')
         self.supertaxon = supertaxon        # link to supertaxon node
         self.subtaxa = []                   # list of links to subtaxa nodes
         self.subtaxa_sum = int(taxa_count)
+        self.lineage = self.create_lineage()
 
-    def check_clade_sum(self):
-        """Returns boolean on whether the sum of subtaxa clade_counts equals
-           this node's clade_count"""
-        return self.clade_count == sum([subtaxon.clade_count for subtaxon in self.subtaxa])
+    def create_lineage(self):
+        """Returns appropriate lineage string, based on ancestors"""
+        # first case (domain)
+        if self.rank == 'd':
+            return 'd__' + self.name
+        elif self.rank in TAXA_RANKS:
+            return get_superlineage(self) + '|{}__{}'.format(self.rank, self.name)
+        else:
+            return ''
 
     def add_child(self, child):
         """Add a subtaxon child node to this node
@@ -71,21 +80,35 @@ class TaxonNode:
 
         return
 
-
     def has_full_subtaxa(self):
         """Return boolean whether all subtaxa have been added to this node"""
         return self.subtaxa_sum == self.clade_count
 
     def __str__(self):
         s = 'Taxon name: {} - Rank {}\n'.format(self.name, self.rank)
+        s += '\tLineage: {}\n'.format(self.lineage)
         s += '\tTaxa ID: {}\n'.format(self.taxid)
         s += '\tClade count: {}\n'.format(self.clade_count)
         s += '\tTaxa count: {}\n'.format(self.taxa_count)
+        s += '\tSubtaxa sum: {}\n'.format(self.subtaxa_sum)
         if self.supertaxon is not None:
             s += '\tSupertaxa: {}\n'.format(self.supertaxon.name)
-        s += '\tSubtaxa sum: {}\n'.format(self.subtaxa_sum)
+        else:
+            s += '\tSupertaxa: None\n'
         s += '\tSubtaxa: {}\n'.format(' '.join([subtaxon.name for subtaxon in self.subtaxa]))
         return s
+
+def get_superlineage(node):
+    """Recursively finds the most recent lineage string from ancestors"""
+    # base case, reached root
+    if not node.supertaxon:
+        return ""
+    # if supertaxon's lineage is not an empty string, return it
+    if node.supertaxon:
+        return node.supertaxon.lineage
+    # Else, recurse
+    else:
+        return get_superlineage(node.supertaxon)
 
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
