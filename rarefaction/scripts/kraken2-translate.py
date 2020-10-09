@@ -166,13 +166,17 @@ def check_file_existence(db_ins, in_paths):
     l.debug('All input files were located')
     return
         
-
+"""
+# =============================================================================
+"""
 def run(db_inspection, infile_paths):
     """Main logical control of the script occurs within"""
-    taxon_dict = create_taxon_dict(db_inspection)
-    
+    taxon_dict = get_taxa_dict(db_inspection)
+"""
+# =============================================================================
+"""    
 
-def create_taxon_dict(db_ins):
+def get_taxa_dict(db_ins):
     """Produce a taxonomy dictionary with taxids as keys and lineage strings as values"""
     # get database inspection file as list of lines
     with open(db_ins, 'r') as f:
@@ -181,6 +185,12 @@ def create_taxon_dict(db_ins):
 
     root = create_tree(inspection_lines)    
     print_tree(root)
+
+    taxa_dict = {}
+    build_taxa_dict(taxa_dict, root)
+
+    for key, value in taxa_dict.items():
+        print(key, ' : ', value)
 
     return ''
 
@@ -233,6 +243,15 @@ def find_next_parent(stack):
         stack.pop()
         #l.debug('Popping node:\n{}'.format(node))
         return find_next_parent(stack)
+
+
+def build_taxa_dict(t_dict, node):
+    """Recursively add taxid/lineage from tree to taxa dictionary"""
+    # add current node if it has lineage
+    if node.lineage:
+        t_dict[node.taxid] = node.lineage
+    for sub in node.subtaxa:
+        build(t_dict, sub)
 
 def print_tree(root):
     """Prints out tree top down"""
