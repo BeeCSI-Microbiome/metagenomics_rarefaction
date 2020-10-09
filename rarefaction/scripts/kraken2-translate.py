@@ -191,7 +191,7 @@ def create_tree(inspection_lines):
         curr_node.add_child(new_node)
         l.debug('Adding {} as direct subtaxa of {}'.format(new_node.name, curr_node.name))
         # put new node on top of stack if it still needs subtaxa
-        if not new_node.has_full_subtaxa:
+        if not new_node.has_full_subtaxa():
             stack.append(new_node)
             l.debug('Putting {} on top of stack'.format(new_node.name))
         
@@ -202,11 +202,12 @@ def create_tree(inspection_lines):
 
 def find_next_parent(stack):
     """Pops stack until a node that still needs children is found"""
-    node = stack.pop()
-    l.debug('Popping node:\n{}'.format(node))
+    node = stack[-1]
     if not node.has_full_subtaxa():
-        return node
+        return stack[-1]
     else:
+        stack.pop()
+        l.debug('Popping node:\n{}'.format(node))
         return find_next_parent(stack)
 
 
