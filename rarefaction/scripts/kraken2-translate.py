@@ -44,7 +44,7 @@ class TaxonNode:
         self.name = name.strip()
         self.supertaxon = supertaxon        # link to supertaxon node
         self.subtaxa = []                   # list of links to subtaxa nodes
-        self.subtaxa_sum = taxa_count
+        self.subtaxa_sum = int(taxa_count)
 
     def check_clade_sum(self):
         """Returns boolean on whether the sum of subtaxa clade_counts equals
@@ -68,6 +68,8 @@ class TaxonNode:
             while curr_parent.supertaxon is not None:
                 curr_parent = curr_parent.supertaxon
                 curr_parent.subtaxa_sum += subtaxon.taxa_count
+        
+        l.debug('Made following node child of next node:\n{}\n{}'.format(subtaxon, self))
 
         return
 
@@ -81,7 +83,9 @@ class TaxonNode:
         s += '\tTaxa ID: {}\n'.format(self.taxid)
         s += '\tClade count: {}\n'.format(self.clade_count)
         s += '\tTaxa count: {}\n'.format(self.taxa_count)
-        s += '\tSupertaxa: {}\n'.format(self.supertaxon)
+        if self.supertaxon is not None:
+            s += '\tSupertaxa: {}\n'.format(self.supertaxon.name)
+        s += '\tSubtaxa sum: {}\n'.format(self.subtaxa_sum)
         s += '\tSubtaxa: {}\n'.format(' '.join([subtaxon.name for subtaxon in self.subtaxa]))
         return s
 
@@ -174,11 +178,12 @@ def create_tree(inspection_lines):
     stack.append(root_node)
 
     # while there are still lines to make nodes from
-    while not inspection_lines:
+    while inspection_lines:
         # get the node at the top of the stack
         curr_node = stack[-1]
         # create new taxon node
         new_node = TaxonNode(*inspection_lines.popleft().split('\t')[1:])
+        l.debug('Creating node for {}'.format(new_node.name))
         
         # if current node has full subtaxa list, pop stack until otherwise
         if curr_node.has_full_subtaxa():
@@ -186,10 +191,11 @@ def create_tree(inspection_lines):
 
         # add the new node to the parent node
         curr_node.add_child(new_node)
-
+        l.debug('Adding {} as direct subtaxa of {}'.format(new_node.name, curr_node.name))
         # put new node on top of stack if it still needs subtaxa
         if not new_node.has_full_subtaxa:
             stack.append(new_node)
+            l.debug('Putting {} on top of stack'.format(new_node.name))
     
     return root_node
     
