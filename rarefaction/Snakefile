@@ -29,13 +29,13 @@ rule translate:
 		db_inspection = "db_inspection.txt",
 		readfiles = expand("filtered/{sample}_filtered.txt", sample=SAMPLES)
 	output:
-		expand("translated/{sample}.txt", sample=SAMPLES)
+		expand("translated/{sample}_translated.txt", sample=SAMPLES)
 	script:
 		"scripts/kraken2-translate.py"
 
 rule krakefaction:
 	input:
-		trans="translated/{sample}.txt",
+		trans="translated/{sample}_translated.txt",
 		untrans="{sample}.txt"
 	output:
 		"rarefied/{sample}.csv"
