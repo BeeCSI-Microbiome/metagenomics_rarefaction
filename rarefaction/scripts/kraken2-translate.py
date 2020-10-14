@@ -172,6 +172,12 @@ def check_file_existence(db_ins, in_paths):
 def run(db_inspection, infile_paths):
     """Main logical control of the script occurs within"""
     taxon_dict = get_taxa_dict(db_inspection)
+
+    for infile in infile_paths:
+        f = open(infile, 'r')
+        reads = f.readlines()
+        f.close()
+        create_outfile(reads, taxon_dict)
 """
 # =============================================================================
 """    
@@ -181,11 +187,11 @@ def get_taxa_dict(db_ins):
     # get database inspection file as list of lines
     with open(db_ins, 'r') as f:
         inspection_lines = f.readlines()
-    l.debug('Head of inspection file {}'.format(inspection_lines[:5]))
 
-    root = create_tree(inspection_lines)    
-    print_tree(root)
+    # create the taxon tree
+    root = create_tree(inspection_lines)
 
+    # create the taxid/lineage dictionary
     taxa_dict = {}
     build_taxa_dict(taxa_dict, root)
 
@@ -203,7 +209,6 @@ def create_tree(inspection_lines):
     # create root node
     root_line = inspection_lines.popleft().split('\t')
     root_node = TaxonNode(*root_line[1:])
-    #l.debug('Create root node:\n{}'.format(root_node))
 
     # stack for tracking nodes with more subtaxa to add
     stack = []
@@ -213,35 +218,29 @@ def create_tree(inspection_lines):
     while inspection_lines:
         # get the node at the top of the stack
         curr_node = stack[-1]
-        # create new taxon node
         new_node = TaxonNode(*inspection_lines.popleft().split('\t')[1:])
-        #l.debug('Creating node for {}'.format(new_node.name))
-        
+
         # if current node has full subtaxa list, pop stack until otherwise
         if curr_node.has_full_subtaxa():
             curr_node = find_next_parent(stack)
 
         # add the new node to the parent node
         curr_node.add_child(new_node)
-        #l.debug('Adding {} as direct subtaxa of {}'.format(new_node.name, curr_node.name))
         # put new node on top of stack if it still needs subtaxa
         if not new_node.has_full_subtaxa():
             stack.append(new_node)
-            #l.debug('Putting {} on top of stack'.format(new_node.name))
         
-        #l.debug('New node after adding to tree:\n{}'.format(new_node))
     
     return root_node
     
 
 def find_next_parent(stack):
-    """Pops stack until a node that still needs children is found"""
+    """Recursively pops stack until a node that still needs children is found"""
     node = stack[-1]
     if not node.has_full_subtaxa():
         return stack[-1]
     else:
         stack.pop()
-        #l.debug('Popping node:\n{}'.format(node))
         return find_next_parent(stack)
 
 
@@ -252,6 +251,11 @@ def build_taxa_dict(t_dict, node):
         t_dict[node.taxid] = node.lineage
     for sub in node.subtaxa:
         build_taxa_dict(t_dict, sub)
+
+
+def create_outfile(reads, t_dict):
+    """Creates the formatted output table file"""
+    
 
 def print_tree(root):
     """Prints out tree top down"""
