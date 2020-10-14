@@ -6,6 +6,7 @@ GLOBALS & IMPORTS
 """
 import os
 import logging
+import re
 from collections import deque
 
 # initialize logging
@@ -173,11 +174,11 @@ def run(db_inspection, infile_paths):
     """Main logical control of the script occurs within"""
     taxon_dict = get_taxa_dict(db_inspection)
 
-    for infile in infile_paths:
+    for infile in infile_paths[:2]:
         f = open(infile, 'r')
         reads = f.readlines()
         f.close()
-        create_outfile(reads, taxon_dict)
+        create_outfile(reads, taxon_dict, infile)
 """
 # =============================================================================
 """    
@@ -253,9 +254,20 @@ def build_taxa_dict(t_dict, node):
         build_taxa_dict(t_dict, sub)
 
 
-def create_outfile(reads, t_dict):
+def create_outfile(reads, t_dict, filename):
     """Creates the formatted output table file"""
-    
+    with open(filename.replace('filtered', 'translated'), 'w') as f:
+        for line in reads:
+            columns = line.split('\t')
+            # data to be first entry in output file
+            datum = columns[1]
+            # find the taxid
+            taxid = re.match('(?<=taxid )(\d*)', columns[2])
+            
+            print(datum + '\t' + t_dict[taxid])
+            #f.write(datum + '\t' + t_dict[taxid])
+            
+
 
 def print_tree(root):
     """Prints out tree top down"""
