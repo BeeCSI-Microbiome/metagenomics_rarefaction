@@ -174,7 +174,7 @@ def run(db_inspection, infile_paths):
     """Main logical control of the script occurs within"""
     taxon_dict = get_taxa_dict(db_inspection)
 
-    for infile in infile_paths[:2]:
+    for infile in infile_paths:
         f = open(infile, 'r')
         reads = f.readlines()
         f.close()
@@ -196,10 +196,7 @@ def get_taxa_dict(db_ins):
     taxa_dict = {}
     build_taxa_dict(taxa_dict, root)
 
-    for key, value in taxa_dict.items():
-        print(key, ' : ', value)
-
-    return ''
+    return taxa_dict
 
 
 def create_tree(inspection_lines):
@@ -249,7 +246,7 @@ def build_taxa_dict(t_dict, node):
     """Recursively add taxid/lineage from tree to taxa dictionary"""
     # add current node if it has lineage
     if node.lineage:
-        t_dict[node.taxid] = node.lineage
+        t_dict[str(node.taxid)] = node.lineage
     for sub in node.subtaxa:
         build_taxa_dict(t_dict, sub)
 
@@ -262,10 +259,11 @@ def create_outfile(reads, t_dict, filename):
             # data to be first entry in output file
             datum = columns[1]
             # find the taxid
-            taxid = re.match('(?<=taxid )(\d*)', columns[2])
-            
-            print(datum + '\t' + t_dict[taxid])
-            #f.write(datum + '\t' + t_dict[taxid])
+            tax_search = re.search('(?<=taxid )(\d*)', columns[2])
+            taxid = tax_search.group(1)
+            if taxid in t_dict.keys():
+                #print(datum + '\t' + t_dict[taxid])
+                f.write(datum + '\t' + t_dict[taxid])
             
 
 
