@@ -57,7 +57,9 @@ class TaxonNode:
         if self.rank == 'd':
             return 'd__' + self.name
         elif self.rank in TAXA_RANKS:
-            return get_superlineage(self) + '|{}__{}'.format(self.rank, self.name)
+            return self.supertaxon.lineage + '|{}__{}'.format(self.rank, self.name)
+        else if self.supertaxon:
+            return self.supertaxon.lineage
         else:
             return ''
 
@@ -102,14 +104,14 @@ class TaxonNode:
         s += '\tSubtaxa: {}\n'.format(' '.join([subtaxon.name for subtaxon in self.subtaxa]))
         return s
 
-def get_superlineage(node):
-    """Recursively finds the most recent lineage string from ancestors"""
-    # if supertaxon's lineage is not an empty string, return it
-    if node.supertaxon.lineage:
-        return node.supertaxon.lineage
-    # Else, recurse
-    else:
-        return get_superlineage(node.supertaxon)
+# def get_superlineage(node):
+#     """Recursively finds the most recent lineage string from ancestors"""
+#     # if supertaxon's lineage is not an empty string, return it
+#     if node.supertaxon.lineage:
+#         return node.supertaxon.lineage
+#     # Else, recurse
+#     else:
+#         return get_superlineage(node.supertaxon)
 
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
