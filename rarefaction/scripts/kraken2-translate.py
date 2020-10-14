@@ -58,7 +58,7 @@ class TaxonNode:
             return 'd__' + self.name
         elif self.rank in TAXA_RANKS:
             return self.supertaxon.lineage + '|{}__{}'.format(self.rank, self.name)
-        else if self.supertaxon:
+        elif self.supertaxon:
             return self.supertaxon.lineage
         else:
             return ''
@@ -265,7 +265,7 @@ def create_outfile(reads, t_dict, filename):
             taxid = tax_search.group(1)
             if taxid in t_dict.keys():
                 #print(datum + '\t' + t_dict[taxid])
-                f.write(datum + '\t' + t_dict[taxid])
+                f.write(datum + '\t' + t_dict[taxid] + '\n')
             
 
 
