@@ -13,7 +13,7 @@ rule filter:
 	output:
 		"filtered/{sample}_filtered.txt"
 	shell:
-		"cat {input} | grep -v \"Apis mellifera\|unclassified\" > {output}"
+		"cat {input} | grep -v \"Apis mellifera\|unclassified\|cellular organism\" > {output}"
 
 rule get_db_inspection:
     input:
@@ -36,7 +36,7 @@ rule translate:
 rule krakefaction:
 	input:
 		trans="translated/{sample}_translated.txt",
-		untrans="{sample}.txt"
+		untrans="filtered/{sample}_filtered.txt"
 	output:
 		"rarefied/{sample}.csv"
 	shell:
