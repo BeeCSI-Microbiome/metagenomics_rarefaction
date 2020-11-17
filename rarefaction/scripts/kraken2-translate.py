@@ -5,20 +5,8 @@ GLOBALS & IMPORTS
 # =============================================================================
 """
 import os
-import logging
 import re
 from collections import deque
-
-# initialize logging
-logging.basicConfig(level=logging.DEBUG)
-l = logging.getLogger('Log')
-c_handler = logging.StreamHandler()
-# Change DEBUG to WARNING when testing is finished
-c_handler.setLevel(logging.DEBUG)
-c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-c_handler.setFormatter(c_format)
-l.addHandler(c_handler)
-l.propagate = False
 
 # ranks that krakefaction needs for lineage
 TAXA_RANKS = ['d','p','c','o','f','g','s']
@@ -139,11 +127,9 @@ def get_inputs():
        Database inspection file, and paths to filtered kraken output files"""
     # retrieve the name of the inspection file from snakemake
     db_inspection = snakemake.input[0]
-    l.debug('Name of database inspection file: {}'.format(db_inspection))
 
     # retrieve the paths of filtered files from snakemake
     infile_paths = snakemake.input[1:]
-    l.debug('{} input files were received from snakemake'.format(len(infile_paths)))
 
     # verifiy files
     check_file_existence(db_inspection, infile_paths)
@@ -155,18 +141,15 @@ def check_file_existence(db_ins, in_paths):
     """Validate file existence, raising error upon failure"""
     # check database inspection file
     if not os.path.isfile(db_ins):
-        l.error('The database inspection file "{}" was not found'.format(db_ins))
         raise RuntimeError(
             "ERROR: could not open database inspection file {}\n".format(db_ins))
     
     # check each kraken input file
     for f in in_paths:
         if not os.path.isfile(f):
-            l.error('The input file "{}" was not found'.format(f))
             raise RuntimeError(
                 "ERROR: could not open input file {}\n".format(f))
 
-    l.debug('All input files were located')
     return
         
 """
