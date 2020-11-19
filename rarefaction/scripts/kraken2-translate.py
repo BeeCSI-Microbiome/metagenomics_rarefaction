@@ -9,7 +9,7 @@ import re
 from collections import deque
 
 # ranks that krakefaction needs for lineage
-TAXA_RANKS = ['d','p','c','o','f','g','s']
+TAXA_RANKS = ['d','p','c','o','f','g','s', 's1']
 
 """
 # =============================================================================
@@ -176,7 +176,7 @@ def get_taxa_dict(db_ins):
 
     # create the taxon tree
     root = create_tree(inspection_lines)
-
+    
     # create the taxid/lineage dictionary
     taxa_dict = {}
     build_taxa_dict(taxa_dict, root)
@@ -232,6 +232,9 @@ def build_taxa_dict(t_dict, node):
     # add current node if it has lineage
     if node.lineage:
         t_dict[str(node.taxid)] = node.lineage
+    else:
+        # if it has no lineage, it is root or subroot
+        t_dict[str(node.taxid)] = 'root'
     for sub in node.subtaxa:
         build_taxa_dict(t_dict, sub)
 
@@ -248,8 +251,12 @@ def create_outfile(reads, t_dict, filename):
             taxid = tax_search.group(1)
             if taxid in t_dict.keys():
                 #print(datum + '\t' + t_dict[taxid])
-                f.write(datum + '\t' + t_dict[taxid] + '\n')
-            
+                if line == reads[-1]:
+                    f.write(datum + '\t' + t_dict[taxid])
+                else:
+                    f.write(datum + '\t' + t_dict[taxid] + '\n')
+            #else:
+               # l.debug('Unable to translate: {}'.format(columns[2]))
 
 
 def print_tree(root):
