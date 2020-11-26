@@ -3,7 +3,7 @@ import glob
 # Read in variables from config file
 configfile: "config.yaml"
 DATAPATHS=config["datapaths"]
-DB="database/{}".format(config["db"])
+DB="databases/{}".format(config["db"])
 FILTER_TARGETS=config["filter_targets"]
 SAMPLES = []
 
