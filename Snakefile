@@ -3,7 +3,7 @@ import glob
 # Read in variables from config file
 configfile: "config.yaml"
 DATAPATHS=config["datapaths"]
-DB="database/{}".format(config["db"])
+DB="databases/{}".format(config["db"])
 FILTER_TARGETS=config["filter_targets"]
 SAMPLES = []
 
@@ -26,7 +26,7 @@ print("Filtering with the following filter string:\n\t'{}'".format(F_STRING))
 
 rule all:
 	input:
-		expand("rarefied/{sample}.csv", sample=SAMPLES)
+		"results/results_concat.csv"
 
 # filter out unclassifed reads, "cellular organism" reads, and all others specified
 # in the config file
@@ -35,7 +35,6 @@ rule filter:
 		"data/{sample}.txt"
 	output:
 		"filtered/{sample}_filtered.txt"
-	threads: 1
 	shell:
 		"cat {input} | grep -v \"" + F_STRING + "\" > {output}"
 
@@ -69,4 +68,10 @@ rule krakefaction:
 	shell:
 		"krakefaction -u {input.untrans} -t {input.trans} -o {output}"
 
-#TODO: add R scripts for producing plots?
+rule concatenate_results:
+	input:
+		expand("rarefied/{sample}.csv", sample=SAMPLES)
+	output:
+		"results/results_concat.csv"
+	script:
+		"scripts/rarefaction_concat_SUBSPECIES.R"
