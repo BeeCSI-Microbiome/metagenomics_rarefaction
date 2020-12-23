@@ -23,7 +23,6 @@ if FILTER_TARGETS:
 print("Filtering with the following filter string:\n\t'{}'".format(F_STRING))
 
 
-
 rule all:
 	input:
 		"results/results_concat.csv"
@@ -68,6 +67,7 @@ rule krakefaction:
 	shell:
 		"krakefaction -u {input.untrans} -t {input.trans} -o {output}"
 
+# Combined rarefaction tables into one .csv file
 rule concatenate_results:
 	input:
 		expand("rarefied/{sample}.csv", sample=SAMPLES)
