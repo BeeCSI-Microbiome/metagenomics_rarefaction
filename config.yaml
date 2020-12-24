@@ -1,6 +1,8 @@
-# name of database directory that is found in database/
+# Name of database directory that is found in database/
 db: "beerolama_v1"
 
+# List of targets taa you wish filter out of your results
+# (e.g. host species in metagenomic analysis)
 filter_targets: 
  - Apis mellifera
 
