@@ -28,7 +28,8 @@ Ensure that the executable `krakefaction` is available from PATH, appending it t
 ### Data Setup
 
 __1.__ Ensure that input kraken2 classification output files are organized as desired within `data/`.
-    * More detail about data organization including managing separate pipeline runs found in `data/README.md`.
+
+ * More detail about data organization including managing separate pipeline runs found in `data/README.md`.
 
 __2.__ Ensure that the kraken2 database that was used for classification is available in `databases/`.
 
