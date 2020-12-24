@@ -15,3 +15,5 @@ You may separate different pipeline runs by creating subdirectories here and spe
 > In the config.yaml file under the data: list, I include 2 lines specifying the location of the data within this `data/` directory: `new-run/shallow` and `new-run/deep`
 
 The benefit of this method of data separation is that for each intermediate step, and the final results, the intermediate/resulting data will be separated in the same way. So the final rarefied results will be in found in the directory `rarefied/new-run/shallow`, etc.
+
+A symbolic link to the original location of the data files works and is useful for large data files which you do not wish to duplicate.
