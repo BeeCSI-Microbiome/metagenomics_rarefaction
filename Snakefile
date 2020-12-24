@@ -10,9 +10,9 @@ SAMPLES = []
 # Get the sample base names (no extensions) with or without subdirectories as groups
 if DATAPATHS:
 	for datapath in DATAPATHS:
-		SAMPLES.extend([path.replace("data/", "").split(".")[0] for path in glob.glob("data/{}/*".format(datapath))])
+		SAMPLES.extend([path.replace("data/", "").split(".")[0] for path in glob.glob("data/{}/*_classification.txt".format(datapath))])
 else:
-	SAMPLES.extend([path.replace("data/", "").split(".")[0] for path in glob.glob("data/*")])
+	SAMPLES.extend([path.replace("data/", "").split(".")[0] for path in glob.glob("data/*_classification.txt")])
 # Display samples
 print("Running with the following samples:\n\t{}".format("\n\t".join(SAMPLES)))
 
