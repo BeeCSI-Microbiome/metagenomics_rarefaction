@@ -74,4 +74,4 @@ rule concatenate_results:
 	output:
 		"results/results_concat.csv"
 	script:
-		"scripts/rarefaction_concat_SUBSPECIES.R"
+		"scripts/rarefaction_concat.R"
