@@ -4,6 +4,8 @@
 
 This directory is where you should store the data to be used with the pipeline.
 
+Ensure that all input files end with `_classification.txt`
+
 You may separate different pipeline runs by creating subdirectories here and specifying the directory names in the config.yaml before running snakemake. You may also separate data groups by using subdirectories (and adjusting the config.yaml file accordingly).
 
 **e.g.**
