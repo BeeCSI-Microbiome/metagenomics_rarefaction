@@ -13,11 +13,11 @@ Command line R (statistics software) is required for concatenation of results.
 Use of Conda is recommended for environment management.
 Requirements include `Kraken2`, `Snakemake`, and their dependencies. For this we provide a conda environment file that can be created with the following command:
 
-    `conda env create --file envs/rarefaction_pipe.txt`
+`conda env create --file envs/rarefaction_pipe.txt`
 
 Activate the Conda environment with the following comming:
 
-    `conda activate rarefaction_pipe`
+`conda activate rarefaction_pipe`
 
 #### Krakefaction
 
@@ -27,14 +27,14 @@ Ensure that the executable `krakefaction` is available from PATH, appending it t
 
 ### Data Setup
 
-1. Ensure that input kraken2 classification output files are organized as desired within `data/`.
+__1.__ Ensure that input kraken2 classification output files are organized as desired within `data/`.
     * More detail about data organization including managing separate pipeline runs found in `data/README.md`.
 
-2. Ensure that the kraken2 database that was used for classification is available in `databases/`.
+__2.__ Ensure that the kraken2 database that was used for classification is available in `databases/`.
 
 Note that symbolic links to original directories works for data and database.
 
-3. Ensure that the `config.yaml` is edited accordingly for database name, filter targets, and data organization. Details are found in the given template file.
+__3.__ Ensure that the `config.yaml` is edited accordingly for database name, filter targets, and data organization. Details are found in the given template file.
 
 
 
@@ -42,7 +42,7 @@ Note that symbolic links to original directories works for data and database.
 
 Once all setup is complete, from within `metagenomics_rarefaction/`, run snakemake with the following command:
 
-    `snakemake`
+`snakemake`
 
 See snakemake documentation for pipeline execution options (link below).
 
@@ -59,15 +59,15 @@ See snakemake documentation for pipeline execution options (link below).
 
 ![Workflow](/images/rarefaction_pipeline_workflow.png)
 
-1. Filter out unclassified reads, root taxa ranks, and any filter targets specified in `config.yaml`. This set takes as input the data paths specified in `config.yaml`. Filtered files are are saved in `filtered/`.
+__1.__ Filter out unclassified reads, root taxa ranks, and any filter targets specified in `config.yaml`. This set takes as input the data paths specified in `config.yaml`. Filtered files are are saved in `filtered/`.
 
-2. Produce a database inspection file utilizing the kraken2 script `kraken2-inspect`, which requires the kraken2 database specified in `config.yaml`. This saves as `metagenomics_rarefaction/db_inspection`
+__2.__ Produce a database inspection file utilizing the kraken2 script `kraken2-inspect`, which requires the kraken2 database specified in `config.yaml`. This saves as `metagenomics_rarefaction/db_inspection`
 
-3. Run python script `scripts/kraken2-translate.py`, which requires filtered files and database inspection file. Translated files are saved in `translated/`.
+__3.__ Run python script `scripts/kraken2-translate.py`, which requires filtered files and database inspection file. Translated files are saved in `translated/`.
 
-4. Perform rarefaction using `krakefaction`, which requires filtered files and translated files. Resulting rarefaction tables are saved in `rarefied/`.
+__4.__ Perform rarefaction using `krakefaction`, which requires filtered files and translated files. Resulting rarefaction tables are saved in `rarefied/`.
 
-5. Concatenate rarefaction tables using R script `scripts/rarefaction_concat.R`. Final concatenated rarefaction table is saved in `results/` and titled `rarefaction_concat.csv`.
+__5.__ Concatenate rarefaction tables using R script `scripts/rarefaction_concat.R`. Final concatenated rarefaction table is saved in `results/` and titled `rarefaction_concat.csv`.
 
 Rarefaction plotting can be done with the resulting concatenated file in R or other plotting software that works with .csv files.
 
